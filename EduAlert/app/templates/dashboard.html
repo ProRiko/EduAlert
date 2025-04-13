@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Dashboard</title>
+</head>
+<body>
+    <header>
+        <h1>Welcome to Your Dashboard</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('main.login') }}">Logout</a></li>
+                <li><a href="{{ url_for('main.attendance') }}">Attendance</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Your Information</h2>
+            <p>Here you can find your personalized information and updates.</p>
+            <!-- Additional user-specific content can be added here -->
+        </section>
+        <section>
+            <h2>Recent Activities</h2>
+            <ul>
+                <li>Activity 1</li>
+                <li>Activity 2</li>
+                <li>Activity 3</li>
+            </ul>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2023 EduAlert. All rights reserved.</p>
+    </footer>
+</body>
+</html>
