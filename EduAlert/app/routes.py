@@ -1,15 +1,17 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session
-from .models import Teacher
+# Import additional modules
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from .models import Teacher, Student, Attendance
 from . import db
-from flask import render_template, request, redirect, url_for, session, flash
-from .models import Student, Attendance
 from datetime import date
+
 main = Blueprint('main', __name__)
 
+# Home redirects to login
 @main.route('/')
 def home():
     return redirect(url_for('main.login'))
 
+# Login route
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
@@ -25,26 +27,24 @@ def login():
             error = "Invalid credentials. Please try again."
     return render_template('login.html', error=error)
 
+# Dashboard view
 @main.route('/dashboard')
 def dashboard():
     if 'teacher_id' not in session:
         return redirect(url_for('main.login'))
     return render_template('dashboard.html', teacher=session['teacher_name'])
 
+# Logout route
 @main.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('main.login'))
-@main.route('/attendance')
-def attendance():
-    return render_template('attendance.html')
 
-
-# Route to display and mark attendance
+# Attendance marking route
 @main.route('/attendance', methods=['GET', 'POST'])
 def attendance():
     if 'teacher_id' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('main.login'))
 
     students = Student.query.all()
 
@@ -60,8 +60,37 @@ def attendance():
                 db.session.add(attendance_record)
         db.session.commit()
         flash('✅ Attendance submitted successfully!')
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('main.dashboard'))
 
     return render_template('attendance.html', students=students)
 
+# View attendance records route
+@main.route('/view_attendance', methods=['GET', 'POST'])
+def view_attendance():
+    if 'teacher_id' not in session:
+        return redirect(url_for('main.login'))
 
+    attendance_records = []
+    students = Student.query.all()
+    filters = {}
+
+    if request.method == 'POST':
+        # Get filters from the form
+        date_filter = request.form.get('date')
+        student_id_filter = request.form.get('student_id')
+
+        # Build the query dynamically based on filters
+        query = Attendance.query
+        if date_filter:
+            query = query.filter_by(date=date_filter)
+            filters['date'] = date_filter
+        if student_id_filter:
+            query = query.filter_by(student_id=student_id_filter)
+            filters['student_id'] = student_id_filter
+
+        attendance_records = query.all()
+
+    return render_template('view_attendance.html', 
+                           students=students, 
+                           attendance_records=attendance_records, 
+                           filters=filters)

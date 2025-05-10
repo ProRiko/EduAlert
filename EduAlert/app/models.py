@@ -26,3 +26,4 @@ class Attendance(db.Model):
     student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
     date = db.Column(db.Date, default=date.today)
     status = db.Column(db.String(10), nullable=False)  # 'Present' or 'Absent'
+    student = db.relationship('Student', backref='attendance_records')
